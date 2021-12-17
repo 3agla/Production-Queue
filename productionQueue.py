@@ -10,63 +10,56 @@ win = Tk()
 win.configure(bg = 'gray')
 win.geometry('1800x700+50+50')
 win.resizable(False, False)
-win.overrideredirect(True)
+win.overrideredirect(True)		
 
 # Creation of variables
+
 line1Que = Queue(maxsize = 5)
 line2Que = Queue(maxsize = 5)
 line3Que = Queue(maxsize = 5)
 line4Que = Queue(maxsize = 5)
 recCom = Queue(maxsize = 5)
 
-# Functions will go in this section
-# Simple function to run an exit command for exit button
-def exitProg():
-	win.quit
-	win.destroy
-	sys.exit()
+# Main function
+def main():
+	message = messagebox.askquestion("Info", "Would you like to restore to the most recent save?")
+	if message == 'yes':
+		load1()
+		load2()
+		load3()
+		load4()
+		loadCom()
+		win.focus_force()
+		entry.focus()
+	else: 
+		win.focus_force()
+		entry.focus()
 
-def load():
-	f = open('line1Saved.txt', 'r')
+# Function to load previously saved data
+def load(fstring, prod, que, queue):
+	f = open(fstring, 'r')
 	step = 1
-	line1Production.insert(1, f.readline())
+	prod.insert(1, f.readline())
 	for i in f.readlines():
 		if i != '\n': 
-			line1Que.put(i)
-			line1Queue.insert(step, i)
+			que.put(i)
+			queue.insert(step, i)
 			step += 1
 	f.close()
 
-	f = open('line2Saved.txt', 'r')
-	step = 1
-	line2Production.insert(1, f.readline())
-	for i in f.readlines():
-		if i != '\n': 
-			line2Que.put(i)
-			line2Queue.insert(step, i)
-			step += 1
-	f.close()
+def load1():
+	load("line1Saved.txt", line1Production, line1Que, line1Queue)
 
-	f = open('line3Saved.txt', 'r')
-	step = 1
-	line3Production.insert(1, f.readline())
-	for i in f.readlines():
-		if i != '\n': 
-			line3Que.put(i)
-			line3Queue.insert(step, i)
-			step += 1
-	f.close()
+def load2():
+	load("line2Saved.txt", line2Production, line2Que, line2Queue)
 
-	f = open('line4Saved.txt', 'r')
-	step = 1
-	line4Production.insert(1, f.readline())
-	for i in f.readlines():
-		if i != '\n': 
-			line4Que.put(i)
-			line4Queue.insert(step, i)
-			step += 1
-	f.close()
+def load3():
+	load("line3Saved.txt", line3Production, line3Que, line3Queue)
 
+def load4():
+	load("line4Saved.txt", line4Production, line4Que, line4Queue)
+
+def loadCom():
 	f = open('recComplete.txt', 'r')
 	step = 1
 	for i in f.readlines():
@@ -74,172 +67,85 @@ def load():
 			recCom.put(i)
 			completedBox.insert(step, i)
 			step += 1
-	f.close()	
+	f.close()
+
+# Functions will go in this section
+# Simple function to run an exit command for exit button
+def exitProg():
+	win.quit
+	win.destroy
+	sys.exit()	
+
+# Function to update que when line button is pressed
+def updateLine(fstring, que, string, queue, prod):
+	if entry.get() == "":return
+	if que.full() == True:
+		error = messagebox.showerror("Error", "Job not added to queue. " + string + " is full")
+		entry.delete(0, 'end')
+		return
+	queue.delete(0, 'end')
+	que.put(entry.get())
+	entry.delete(0, 'end')
+	step = 1
+	f = open(fstring, 'w')
+	f.write(prod.get(0))
+	f.write('\n')
+	for i in que.queue:
+		queue.insert(step, i)
+		step += 1
+		f.write(i)
+		f.write('\n')
+	f.close()
 
 def updateLine1():
-	f = open('line1Saved.txt', 'w')
-	if entry.get() == "":return
-	if line1Que.full() == True:
-		error = messagebox.showerror("Error", "Job not added to queue.  Line 1 is full")
-		entry.delete(0, 'end')
-		return
-	line1Queue.delete(0, 'end')
-	line1Que.put(entry.get())
-	entry.delete(0, 'end')
-	step = 1
-	f.write(line1Production.get(0))
-	f.write('\n')
-	for i in line1Que.queue:
-		line1Queue.insert(step, i)
-		step += 1
-		f.write(i)
-		f.write('\n')
-	f.close()
+	updateLine("line1Saved.txt", line1Que, 'Line 1', line1Queue, line1Production)
 
 def updateLine2():
-	f = open('line2Saved.txt', 'w')
-	if entry.get() == "":return
-	if line2Que.full() == True:
-		error = messagebox.showerror("Error", "Job not added to queue.  Line 2 is full")
-		entry.delete(0, 'end')
-		return
-	line2Queue.delete(0, 'end')
-	line2Que.put(entry.get())
-	entry.delete(0, 'end')
-	step = 1
-	f.write(line2Production.get(0))
-	f.write('\n')
-	for i in line2Que.queue:
-		line2Queue.insert(step, i)
-		step += 1
-		f.write(i)
-		f.write('\n')
-	f.close()
+	updateLine("line2Saved.txt", line2Que, 'Line 2', line2Queue, line2Production)
 
 def updateLine3():
-	f = open('line3Saved.txt', 'w')
-	if entry.get() == "":return
-	if line3Que.full() == True:
-		error = messagebox.showerror("Error", "Job not added to queue.  Line 3 is full")
-		entry.delete(0, 'end')
-		return
-	line3Queue.delete(0, 'end')
-	line3Que.put(entry.get())
-	entry.delete(0, 'end')
-	step = 1
-	f.write(line3Production.get(0))
-	f.write('\n')
-	for i in line3Que.queue:
-		line3Queue.insert(step, i)
-		step += 1
-		f.write(i)
-		f.write('\n')
-	f.close()
+	updateLine("line3Saved.txt", line3Que, 'Line 3', line3Queue, line3Production)
 
 def updateLine4():
-	f = open('line4Saved.txt', 'w')
-	if entry.get() == "":return
-	if line4Que.full() == True:
-		error = messagebox.showerror("Error", "Job not added to queue.  Line 4 is full")
-		entry.delete(0, 'end')
-		return
-	line4Queue.delete(0, 'end')
-	line4Que.put(entry.get())
-	entry.delete(0, 'end')
-	step = 1
-	f.write(line4Production.get(0))
-	f.write('\n')
-	for i in line4Que.queue:
-		line4Queue.insert(step, i)
-		step += 1
-		f.write(i)
-		f.write('\n')
-	f.close()
+	updateLine("line4Saved.txt", line4Que, 'Line 4', line4Queue, line4Production)
 
-def jobComplete1():
-	f = open('line1Saved.txt', 'w')
-	tmp = line1Production.get(0)
-	line1Production.delete(0, 'end')
-	if line1Que.empty() == True:
-		error = messagebox.showinfo("Nice!", "Good job!  The queue is done")
-		f.write(line1Production.get(0))
+# Function to update que when job complete button is pressed
+def jobComplete(fstring, prod, que, queue):
+	f = open(fstring, 'w')
+	tmp = prod.get(0)
+	prod.delete(0, 'end')
+	if que.empty() == True:
+		info = messagebox.showinfo("Nice!", "Good job!  The queue is done")
+		f.write(prod.get(0))
 		f.write('\n')
+		recentlyCom(tmp)
+		return
 	recentlyCom(tmp)
-	line1Production.insert(1, line1Que.get(0))
-	line1Queue.delete(0, 'end')
+	prod.insert(1, que.get(0))
+	queue.delete(0, 'end')
 	step = 1
-	f.write(line1Production.get(0))
+	f.write(prod.get(0))
 	f.write('\n')
-	for i in line1Que.queue:
-		line1Queue.insert(step, i)
+	for i in que.queue:
+		queue.insert(step, i)
 		step += 1
 		f.write(i)
 		f.write('\n')
 	f.close()
+	
+def jobComplete1():
+	jobComplete("line1Saved.txt", line1Production, line1Que, line1Queue)
 
 def jobComplete2():
-	f = open('line2Saved.txt', 'w')
-	tmp = line2Production.get(0)
-	line2Production.delete(0, 'end')
-	if line2Que.empty() == True:
-		error = messagebox.showinfo("Nice!", "Good job!  The queue is done")
-		f.write(line2Production.get(0))
-		f.write('\n')
-	recentlyCom(tmp)
-	line2Production.insert(1, line2Que.get(0))
-	line2Queue.delete(0, 'end')
-	step = 1
-	f.write(line2Production.get(0))
-	f.write('\n')
-	for i in line2Que.queue:
-		line2Queue.insert(step, i)
-		step += 1
-		f.write(i)
-		f.write('\n')
-	f.close()
+	jobComplete("line2Saved.txt", line2Production, line2Que, line2Queue)
 
 def jobComplete3():
-	f = open('line3Saved.txt', 'w')
-	tmp = line3Production.get(0)
-	line3Production.delete(0, 'end')
-	if line3Que.empty() == True:
-		error = messagebox.showinfo("Nice!", "Good job!  The queue is done")
-		f.write(line3Production.get(0))
-		f.write('\n')
-	recentlyCom(tmp)
-	line3Production.insert(1, line3Que.get(0))
-	line3Queue.delete(0, 'end')
-	step = 1
-	f.write(line3Production.get(0))
-	f.write('\n')
-	for i in line3Que.queue:
-		line3Queue.insert(step, i)
-		step += 1
-		f.write(i)
-		f.write('\n')
-	f.close()
+	jobComplete("line3Saved.txt", line3Production, line3Que, line3Queue)
 
 def jobComplete4():
-	f = open('line4Saved.txt', 'w')
-	tmp = line4Production.get(0)
-	if line4Que.empty() == True:
-		error = messagebox.showinfo("Nice!", "Good job!  The queue is done")
-		f.write(line4Production.get(0))
-		f.write('\n')
-	recentlyCom(tmp)
-	line4Production.delete(0, 'end')
-	line4Production.insert(1, line4Que.get(0))
-	line4Queue.delete(0, 'end')
-	step = 1
-	f.write(line4Production.get(0))
-	f.write('\n')
-	for i in line4Que.queue:
-		line4Queue.insert(step, i)
-		step += 1
-		f.write(i)
-		f.write('\n')
-	f.close()
+	jobComplete("line4Saved.txt", line4Production, line4Que, line4Queue)
 
+# Function to update recently complete que automatically when job complete button is pressed
 def recentlyCom(que):
 	if que != '\n':
 		f = open('recComplete.txt', 'w')
@@ -253,6 +159,7 @@ def recentlyCom(que):
 			completedBox.insert(step, i)
 			step += 1
 			f.write(i)
+			f.write('\n')
 		f.close()
 	
 # Buttons, labels, etc.. will go in this section
@@ -264,9 +171,9 @@ header.pack()
 exitBtn = Button(win, text = "Exit", width = 10, bg = 'white', 
 	activebackground = 'blue', relief = SUNKEN, command = exitProg)
 exitBtn.place(x = 1700, y = 650)
-loadBtn = Button(win, text = "Load", width = 10, bg = 'white', 
-	activebackground = 'blue', relief = SUNKEN, command = load)
-loadBtn.place(x = 20, y = 650)
+# loadBtn = Button(win, text = "Load", width = 10, bg = 'white', 
+	#activebackground = 'blue', relief = SUNKEN, command = load)
+# loadBtn.place(x = 20, y = 650)
 
 # Creates labels displaying line number
 line1Label = Label(win, text = "Line 1 production", bg = 'gray', font = ("Arial", 18))
@@ -277,16 +184,6 @@ line3Label = Label(win, text = "Line 3 production", bg = 'gray', font = ("Arial"
 line3Label.place(x = 1000, y = 100)
 line4Label = Label(win, text = "Line 4 production", bg = 'gray', font = ("Arial", 18))
 line4Label.place(x = 1400, y = 100)
-
-# Creates a list box showing current production
-line1Production = Listbox(win, height = 1, width = 35, fg = 'blue')
-line1Production.place(x = 190, y = 150)
-line2Production = Listbox(win, height = 1, width = 35, fg = 'blue')
-line2Production.place(x = 590, y = 150)
-line3Production = Listbox(win, height = 1, width = 35, fg = 'blue')
-line3Production.place(x = 990, y = 150)
-line4Production = Listbox(win, height = 1, width = 35, fg = 'blue')
-line4Production.place(x = 1390, y = 150)
 
 # Creates a complete button for all lines
 line1Com = Button(win, text = "Complete Job", width = 12, bg = 'white', 
@@ -311,6 +208,16 @@ line3LblQue = Label(win, text = "Line 3 queue", bg = 'gray', font = ("Arial", 18
 line3LblQue.place(x = 1020, y = 220)
 line4LblQue = Label(win, text = "Line 4 queue", bg = 'gray', font = ("Arial", 18))
 line4LblQue.place(x = 1420, y = 220)
+
+# Creates a list box showing current production
+line1Production = Listbox(win, height = 1, width = 35, fg = 'blue')
+line1Production.place(x = 190, y = 150)
+line2Production = Listbox(win, height = 1, width = 35, fg = 'blue')
+line2Production.place(x = 590, y = 150)
+line3Production = Listbox(win, height = 1, width = 35, fg = 'blue')
+line3Production.place(x = 990, y = 150)
+line4Production = Listbox(win, height = 1, width = 35, fg = 'blue')
+line4Production.place(x = 1390, y = 150)
 
 # Creates a list box showing current queue
 line1Queue = Listbox(win, height = 5, width = 35, fg = 'yellow', bg = 'black')
@@ -345,6 +252,9 @@ line3Btn.place(x = 600, y = 550)
 line4Btn = Button(win, text = "Line 4", width = 5, bg = 'white', 
 	activebackground = 'blue', relief = SUNKEN, command = updateLine4)
 line4Btn.place(x = 650, y = 550)
+
+if __name__=="__main__":
+	main()
 
 win.mainloop()
 
