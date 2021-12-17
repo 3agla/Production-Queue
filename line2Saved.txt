@@ -1,3 +1,1 @@
-Line 2 Test
-Line 2 Test 1
-Line 2 Test 2
+Test2
